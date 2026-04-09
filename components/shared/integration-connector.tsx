@@ -46,17 +46,24 @@ const PLATFORMS: IntegrationPlatform[] = [
     description: "Google advertising platform",
     fields: [
       {
-        name: "api_key",
-        label: "API Key",
+        name: "developer_token",
+        label: "Developer Token",
         type: "password",
-        placeholder: "Your API key",
+        placeholder: "Your Google Ads Developer Token",
         required: true,
       },
       {
         name: "customer_id",
         label: "Customer ID",
         type: "text",
-        placeholder: "1234567890",
+        placeholder: "123-456-7890",
+        required: true,
+      },
+      {
+        name: "refresh_token",
+        label: "Refresh Token",
+        type: "password",
+        placeholder: "Your OAuth refresh token",
         required: true,
       },
     ],

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MetaAPIClient } from "@/lib/integrations/meta";
+import { GoogleAdsAPIClient } from "@/lib/integrations/google-ads";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -36,11 +37,24 @@ export async function POST(request: NextRequest) {
     // Test connection for Meta
     if (platform === "meta_ads") {
       const client = new MetaAPIClient(credentials);
-      const isConnected = await client.testConnection();
+      const testResult = await client.testConnection();
 
-      if (!isConnected) {
+      if (!testResult.success) {
         return NextResponse.json(
-          { error: "Invalid Meta credentials" },
+          { error: `Invalid Meta credentials: ${testResult.error}` },
+          { status: 401 }
+        );
+      }
+    }
+
+    // Test connection for Google Ads
+    if (platform === "google_ads") {
+      const client = new GoogleAdsAPIClient(credentials);
+      const testResult = await client.testConnection();
+
+      if (!testResult.success) {
+        return NextResponse.json(
+          { error: `Invalid Google Ads credentials: ${testResult.error}` },
           { status: 401 }
         );
       }

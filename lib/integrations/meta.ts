@@ -319,7 +319,7 @@ export class MetaAPIClient {
   /**
    * Test connection - verify credentials are valid
    */
-  async testConnection(): Promise<boolean> {
+  async testConnection(): Promise<{ success: boolean; error?: string }> {
     try {
       await this.marketingClient.get("/me", {
         params: {
@@ -327,10 +327,11 @@ export class MetaAPIClient {
         },
       });
 
-      return true;
-    } catch (error) {
-      console.error("Meta API connection test failed:", error);
-      return false;
+      return { success: true };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error?.message || error.message || "Unknown error";
+      console.error("Meta API connection test failed:", errorMessage);
+      return { success: false, error: errorMessage };
     }
   }
 }
