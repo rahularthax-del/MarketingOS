@@ -13,6 +13,39 @@ interface Discussion {
 }
 
 const SAMPLE_DISCUSSIONS: { [key: string]: Discussion } = {
+  cpl: {
+    userQuery: "How can we achieve high ROAS while keeping CPL (Cost Per Lead) low?",
+    teamMembers: {
+      "🎯 Sarah Kim (Strategy Lead)":
+        "This is about efficiency vs. scale. Our current CPL is $3.30 average but ROAS is 2.56x. To optimize both: (1) Focus high-quality leads, (2) Improve landing page conversion, (3) Refine audience targeting, (4) Test value-based bidding.",
+      "🏗️ David Chen (Campaign Architect)":
+        "The issue is audience quality. Retargeting campaign has $1.44 CPL but 3.35x ROAS. That's our model. For new audiences: start with Lookalike audiences (higher intent), use value-based bidding to signal lead quality, not just quantity.",
+      "🎨 Lisa Rodriguez (Creative Analyst)":
+        "Creative affects both CPL and ROAS. High-intent creatives (demos, case studies, limited-time offers) get 35% lower CPL. Lower-intent creatives (awareness content) cost 2.5x more per lead but capture broader audience.",
+      "💰 Marcus Johnson (Bid Optimizer)":
+        "Smart bidding is key. Value-based bidding prioritizes high-quality leads, naturally lowering CPL. Target CPA of $2-3 per lead. For Retargeting: lower to $1.20 CPL. For Prospecting: $3.50-4.00 CPL is acceptable if they convert.",
+      "📊 Emma Thompson (Reporting Analyst)":
+        "Data shows: Retargeting has 44% lower CPL ($1.44 vs $2.35-5.10) but limited volume. Solution: (1) Expand retargeting audience, (2) Build lookalike audiences from best converters, (3) Create quality-based lead scoring to measure lead value.",
+    },
+    debate: [
+      "Sarah: 'Should we reduce Prospecting budget if CPL is higher?'",
+      "Emma: 'No. Prospecting has $5.10 CPL but eventually creates future retargeting pool. It's long-term investment.'",
+      "Marcus: 'But we should optimize prospecting CPL. Currently bidding too high. Can reduce $0.50-0.75 per lead with smart bidding.'",
+      "David: 'Agreed. I recommend value-based bidding for prospecting. Target $3.50 CPL instead of $5.10.'",
+      "Lisa: 'And I'll create higher-intent creatives for prospecting. Can reduce CPL by 30%.'",
+      "Sarah: 'So strategy: Keep retargeting at $1.44 CPL (high ROAS), optimize prospecting from $5.10 to $3.50 CPL via bidding + creative.'",
+    ],
+    consensus:
+      "3-tier CPL strategy: Retargeting $1.44 CPL (maximize), Lookalike $2.50 CPL, Prospecting $3.50 CPL. Implement value-based bidding to signal lead quality. Expected: reduce overall CPL to $2.75 while maintaining 2.8x+ ROAS.",
+    actionItems: [
+      "Marcus: Switch bidding to value-based, set daily CPL targets by campaign tier",
+      "David: Create lookalike audiences from best-converting leads",
+      "Lisa: Develop high-intent creative variations for prospecting campaigns",
+      "Emma: Set up lead quality scoring system and CPL attribution",
+      "Sarah: Review and approve new targeting strategy",
+      "Team: Daily CPL monitoring - pause if CPL exceeds tier targets by 20%",
+    ],
+  },
   campaign: {
     userQuery: "How should we structure our Q2 campaign strategy?",
     teamMembers: {
@@ -107,6 +140,13 @@ export default function PerformanceChatPage() {
       let discussion: Discussion | null = null;
 
       if (
+        input.toLowerCase().includes("cpl") ||
+        input.toLowerCase().includes("cost per lead") ||
+        (input.toLowerCase().includes("roas") && input.toLowerCase().includes("cpl")) ||
+        (input.toLowerCase().includes("roas") && input.toLowerCase().includes("minimal"))
+      ) {
+        discussion = SAMPLE_DISCUSSIONS.cpl;
+      } else if (
         input.toLowerCase().includes("campaign") ||
         input.toLowerCase().includes("strategy") ||
         input.toLowerCase().includes("structure")
