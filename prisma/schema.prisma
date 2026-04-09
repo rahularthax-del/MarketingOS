@@ -1,0 +1,240 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url = env("DATABASE_URL")
+}
+
+// ─── Core Models ────────────────────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  password      String?  // hashed password for email/password auth
+  role          String   @default("VIEWER")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  brand         Brand?
+  agentLogs     AgentLog[]
+  notifications Notification[]
+}
+
+model Brand {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name            String
+  industry        String?
+  website         String?
+
+  // Colors
+  primaryColor    String?
+  secondaryColor  String?
+  accentColor     String?
+  tertiaryColor   String?
+  supplementaryColor String?
+
+  // Fonts
+  fontPrimary     String?
+  fontSecondary   String?
+
+  // Brand guidelines
+  brandVoice      String   @default("professional")
+  brandTagline    String?
+  brandMission    String?
+  brandValues     String?
+  targetAudience  String?
+  logoUrl         String?
+
+  // Social Media
+  instagramHandle String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  integrations    Integration[]
+  agentLogs       AgentLog[]
+  campaigns       Campaign[]
+  socialPosts     SocialPost[]
+  socialAccounts  SocialAccount[]
+  keywords        Keyword[]
+  contentPieces   ContentPiece[]
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  platform    String   // meta_ads, google_ads, instagram, facebook, twitter, linkedin, canva, gsc, ga4
+  credentials String?     // encrypted credentials
+  isConnected Boolean  @default(false)
+  lastTested  DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([brandId, platform])
+}
+
+// ─── Activity Logs ──────────────────────────────────────────────────────────
+
+model AgentLog {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  team      String   // performance | social | seo
+  agent     String   // agent name
+  action    String
+  reasoning String?
+  result    String?
+  status    String   @default("success") // success | error | warning
+
+  createdAt DateTime @default(now())
+}
+
+// ─── Performance Marketing Team ─────────────────────────────────────────────
+
+model Campaign {
+  id           String   @id @default(cuid())
+  brandId      String
+  brand        Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  platform     String   // meta | google
+  externalId   String?
+  name         String
+  objective    String?
+  status       String   @default("draft") // draft | active | paused | archived
+  budget       Float?
+
+  spend        Float    @default(0)
+  impressions  Int      @default(0)
+  clicks       Int      @default(0)
+  conversions  Int      @default(0)
+  revenue      Float    @default(0)
+  roas         Float    @default(0)
+  ctr          Float    @default(0)
+  cpa          Float    @default(0)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── Social Media Team ──────────────────────────────────────────────────────
+
+model SocialPost {
+  id            String   @id @default(cuid())
+  brandId       String
+  brand         Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  platform      String   // instagram | facebook | twitter | linkedin | tiktok
+  content       String
+  hashtags      String?
+  imageUrl      String?
+
+  status        String   @default("draft") // draft | scheduled | published
+  scheduledAt   DateTime?
+  publishedAt   DateTime?
+
+  likes         Int      @default(0)
+  comments      Int      @default(0)
+  shares        Int      @default(0)
+  reach         Int      @default(0)
+  impressions   Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SocialAccount {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  platform        String   // instagram | facebook | twitter | linkedin
+  handle          String
+
+  followers       Int      @default(0)
+  following       Int      @default(0)
+  engagementRate  Float    @default(0)
+
+  lastSyncedAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([brandId, platform, handle])
+}
+
+// ─── SEO Team ──────────────────────────────────────────────────────────────
+
+model Keyword {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  keyword         String
+  currentRank     Int?
+  previousRank    Int?
+
+  searchVolume    Int      @default(0)
+  difficulty      Float    @default(0)
+  intent          String   @default("informational")
+
+  clicks          Int      @default(0)
+  impressions     Int      @default(0)
+  ctr             Float    @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([brandId, keyword])
+}
+
+model ContentPiece {
+  id          String   @id @default(cuid())
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String?
+  content     String?
+  targetKeyword String?
+
+  status      String   @default("draft") // draft | published | archived
+  publishedAt DateTime?
+
+  pageViews   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([brandId, slug])
+}
+
+// ─── Notifications ─────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title     String
+  message   String
+  type      String   @default("info") // info | warning | success | error
+  isRead    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
