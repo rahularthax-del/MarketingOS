@@ -44,95 +44,62 @@ export default function PerformancePage() {
     }
   }, [brandId]);
 
+  const getMockCampaigns = () => [
+    {
+      id: "mock-1",
+      name: "Summer Product Launch",
+      status: "ACTIVE",
+      spend: 1250.50,
+      impressions: 45000,
+      clicks: 1203,
+      conversions: 87,
+      roas: 245.5,
+      ctr: 2.67,
+      cpa: 14.38,
+    },
+    {
+      id: "mock-2",
+      name: "Brand Awareness Campaign",
+      status: "ACTIVE",
+      spend: 890.25,
+      impressions: 72000,
+      clicks: 1890,
+      conversions: 142,
+      roas: 189.3,
+      ctr: 2.63,
+      cpa: 6.27,
+    },
+    {
+      id: "mock-3",
+      name: "Retargeting Campaign",
+      status: "PAUSED",
+      spend: 450.00,
+      impressions: 28000,
+      clicks: 892,
+      conversions: 156,
+      roas: 335.2,
+      ctr: 3.18,
+      cpa: 2.88,
+    },
+  ];
+
   const fetchCampaigns = async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/meta/campaigns?brandId=${brandId}`);
       if (res.ok) {
         const data = await res.json();
-        setCampaigns(data.campaigns || []);
+        const campaignsData = data.campaigns || [];
+        // If no campaigns from API, use mock data
+        setCampaigns(campaignsData.length > 0 ? campaignsData : getMockCampaigns());
       } else {
         // Show mock data if real integration not available
-        setCampaigns([
-          {
-            id: "mock-1",
-            name: "Summer Product Launch",
-            status: "ACTIVE",
-            spend: 1250.50,
-            impressions: 45000,
-            clicks: 1203,
-            conversions: 87,
-            roas: 245.5,
-            ctr: 2.67,
-            cpa: 14.38,
-          },
-          {
-            id: "mock-2",
-            name: "Brand Awareness Campaign",
-            status: "ACTIVE",
-            spend: 890.25,
-            impressions: 72000,
-            clicks: 1890,
-            conversions: 142,
-            roas: 189.3,
-            ctr: 2.63,
-            cpa: 6.27,
-          },
-          {
-            id: "mock-3",
-            name: "Retargeting Campaign",
-            status: "PAUSED",
-            spend: 450.00,
-            impressions: 28000,
-            clicks: 892,
-            conversions: 156,
-            roas: 335.2,
-            ctr: 3.18,
-            cpa: 2.88,
-          },
-        ]);
+        setCampaigns(getMockCampaigns());
       }
     } catch (error) {
       console.error("Error fetching campaigns:", error);
       // Fallback to mock data
-      setCampaigns([
-        {
-          id: "mock-1",
-          name: "Summer Product Launch",
-          status: "ACTIVE",
-          spend: 1250.50,
-          impressions: 45000,
-          clicks: 1203,
-          conversions: 87,
-          roas: 245.5,
-          ctr: 2.67,
-          cpa: 14.38,
-        },
-        {
-          id: "mock-2",
-          name: "Brand Awareness Campaign",
-          status: "ACTIVE",
-          spend: 890.25,
-          impressions: 72000,
-          clicks: 1890,
-          conversions: 142,
-          roas: 189.3,
-          ctr: 2.63,
-          cpa: 6.27,
-        },
-        {
-          id: "mock-3",
-          name: "Retargeting Campaign",
-          status: "PAUSED",
-          spend: 450.00,
-          impressions: 28000,
-          clicks: 892,
-          conversions: 156,
-          roas: 335.2,
-          ctr: 3.18,
-          cpa: 2.88,
-        },
-      ]);
+      setCampaigns(getMockCampaigns());
     } finally {
       setLoading(false);
     }
